@@ -85,19 +85,22 @@ def LoRaReceiver(queue):
 			# Received a packet!
 			# Print out the raw bytes of the packet:
 			print("Received (raw bytes): {0}".format(packet))
-			# And decode to ASCII text and print it too.  Note that you always
-			# receive raw bytes and need to convert to a text format like ASCII
-			# if you intend to do string processing on your data.  Make sure the
-			# sending side is sending ASCII data before you try to decode!
-			packet_text = str(packet, "ascii")
-			print("Received (ASCII): {0}".format(packet_text))
-			formatted_txt = extract_values(packet_text)
-			
-			# Also read the RSSI (signal strength) of the last received message and
-			# print it.
-			rssi = rfm9x.last_rssi
-			print("Received signal strength: {0} dB".format(rssi))
-			sender(q, formatted_txt[0], formatted_txt[1], formatted_txt[2])
+      try:
+        # And decode to ASCII text and print it too.  Note that you always
+        # receive raw bytes and need to convert to a text format like ASCII
+        # if you intend to do string processing on your data.  Make sure the
+        # sending side is sending ASCII data before you try to decode!
+        packet_text = str(packet, "ascii")
+        print("Received (ASCII): {0}".format(packet_text))
+        formatted_txt = extract_values(packet_text)
+        
+        # Also read the RSSI (signal strength) of the last received message and
+        # print it.
+        rssi = rfm9x.last_rssi
+        print("Received signal strength: {0} dB".format(rssi))
+        sender(q, formatted_txt[0], formatted_txt[1], formatted_txt[2])
+      except UnicodeDecodeError:
+        print("Failed to decode packet. Ignoring this packet and continuing...")
 
 	
 def update_data(queue):
