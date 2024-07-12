@@ -219,8 +219,12 @@ def get_average_levels():
     return jsonify(average_levels.get(camera_id, []))
 
 # Regularly update average levels in the background
-    update_average_levels()
 def update_data():
+    update_average_levels()
     Timer(5, update_data).start()
 
 update_data()
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
