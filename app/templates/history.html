@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Depth History</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Water Depth History for Camera ID: {{ camera_id }}</h1>
+    <div id="chart"></div>
+
+    <script>
+        const cameraId = { camera_id };  // Use the camera ID passed from Flask
+        let data = Array(60).fill(0);  // Initialize with 60 columns
+
+        // Function to update the chart
+        function updateChart() {
+            const layout = {
+                title: 'Water Depth vs Time',
+                xaxis: { title: 'Time (min)' },
+                yaxis: { title: 'Water Depth (cm)', range: [0, 1] }  // Assuming depth range is 0 to 1 meter
+            };
+
+            const trace = {
+                x: Array.from({length: data.length}, (_, i) => i),  // X axis as minutes
+                y: data,
+                type: 'bar'
+            };
+
+            Plotly.react('chart', [trace], layout);
+        }
+
+        // Function to fetch and update data
+        async function fetchData() {
+            const response = await fetch(`/api/average_levels?camera_id=${cameraId}`);
+            const levels = await response.json();
+            const now = new Date();
+
+            const minute = now.getUTCMinutes();
+
+            // Update data array
+            data[minute] = levels[minute];
+
+            updateChart();
+        }
+
+        // Initial chart rendering
+        updateChart();
+
+        // Update chart every 5 seconds
+        setInterval(fetchData, 5000);
+    </script>
+</body>
+</html>

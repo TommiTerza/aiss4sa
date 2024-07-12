@@ -1,0 +1,231 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #ffffff ; 
+}
+
+.header {
+    background: linear-gradient(135deg, #02353C 30%, #449342 100%); /* Dark green to green gradient */
+    color: white;
+    text-align: center;
+    padding: 10px 20px;
+    font-size: 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+    border-radius: 0; /* Removed rounded corners */
+}
+
+.header .logo {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.header .logo img {
+    height: 40px;
+    margin-right: 20px;
+}
+
+.control-buttons {
+    display: flex;
+    gap: 10px;
+    margin-right: 40px; /* Added more margin to the right */
+}
+
+.control-buttons button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #449342; /* Green */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    transition: background-color 0.3s, transform 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.control-buttons button:hover {
+    background-color: #2EAF7D; /* Lighter green */
+    transform: scale(1.05);
+}
+
+.control-buttons button:active {
+    background-color: #02353C; /* Dark green */
+    transform: scale(0.95);
+}
+
+.threshold-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.threshold-control label {
+    font-weight: bold;
+    color: white; 
+}
+
+.threshold-control input {
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100px;
+    text-align: center;
+}
+
+#map-container {
+    display: flex;
+    height: calc(75% - 40px);
+    margin: 20px;
+}
+
+#map {
+    flex: 3;
+    height: 100%;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#sidebar {
+    flex: 1;
+    padding: 20px;
+    background-color: linear-gradient(135deg, #02353C 30%, #449342 100%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    margin-left: 20px;
+}
+
+#controls {
+    display: flex;
+    justify-content: center; /* Center the threshold control */
+    align-items: center;
+    padding: 10px 40px;
+    background: linear-gradient(135deg, #02353C 30%, #449342 100%); /* Dark green to green gradient */
+    border-top: 1px solid #ccc;
+    position: fixed;
+    bottom: 0; /* Set to 0 */
+    width: calc(100% - 80px);
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0; /* Removed rounded corners */
+    margin-bottom: 0; /* Set margin to 0 */
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #ffffff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+table, th, td {
+    border: 1px solid #ccc;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #02353C; /* Dark green */
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-align: center;
+    font-size: 1.2em;
+    letter-spacing: 0.05em;
+}
+
+tr:nth-child(even) {
+    background-color: #E6F4EA; /* Light green */
+}
+
+tr:nth-child(odd) {
+    background-color: #F0F9F4; /* Lighter green */
+}
+
+tr:hover {
+    background-color: #E2E8F0; /* Light Blue */
+}
+
+button {
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #449342; /* Green */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    background-color: #2EAF7D; /* Light green */
+    transform: scale(1.05);
+}
+
+button:active {
+    background-color: #02353C; /* Dark green */
+    transform: scale(0.95);
+}
+
+.blinking {
+    animation: blinkingEffect 1s infinite;
+}
+
+@keyframes blinkingEffect {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
