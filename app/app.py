@@ -14,8 +14,18 @@ import adafruit_rfm9x
 
 app = Flask(__name__)
 
-# Simulated data storage
+# Data storage
 modules = [
+    {"id": 1, "depth": 0.0, "temperature": 0.0, "location": None, "camera": None},
+    {"id": 2, "depth": 0.0, "temperature": 0.0, "location": None, "camera": None},
+    {"id": 3, "depth": 0.0, "temperature": 0.0, "location": None, "camera": None},
+    {"id": 4, "depth": 0.0, "temperature": 0.0, "location": None, "camera": None},
+    {"id": 5, "depth": 0.0, "temperature": 0.0, "location": None, "camera": None},
+    {"id": 6, "depth": 0.0, "temperature": 0.0, "location": None, "camera": None}
+]
+
+# New version of the data
+next_modules = [
     {"id": 1, "depth": 0.0, "temperature": 0.0, "location": None, "camera": None},
     {"id": 2, "depth": 0.0, "temperature": 0.0, "location": None, "camera": None},
     {"id": 3, "depth": 0.0, "temperature": 0.0, "location": None, "camera": None},
@@ -44,66 +54,62 @@ def extract_values(data):
         return None
 
 def LoRaReceiver(queue):
-	
-	# Define radio parameters.
-	RADIO_FREQ_MHZ = 433.0  # Frequency of the radio in Mhz. Must match your
-	# module! Can be a value like 915.0, 433.0, etc.
+    # Define radio parameters.
+    RADIO_FREQ_MHZ = 433.0  # Frequency of the radio in Mhz. Must match your module! Can be a value like 915.0, 433.0, etc.
 
-	# Define pins connected to the chip, use these if wiring up the breakout according to the guide:
-	CS = digitalio.DigitalInOut(board.CE1)
-	RESET = digitalio.DigitalInOut(board.D25)
+    # Define pins connected to the chip, use these if wiring up the breakout according to the guide:
+    CS = digitalio.DigitalInOut(board.CE1)
+    RESET = digitalio.DigitalInOut(board.D25)
 
-	# Initialize SPI bus.
-	spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
+    # Initialize SPI bus.
+    spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 
-	# Initialze RFM radio
-	rfm9x = adafruit_rfm9x.RFM9x(spi, CS, RESET, RADIO_FREQ_MHZ, baudrate=100000)
+    # Initialize RFM radio
+    rfm9x = adafruit_rfm9x.RFM9x(spi, CS, RESET, RADIO_FREQ_MHZ, baudrate=100000)
 
-	# Note that the radio is configured in LoRa mode so you can't control sync
-	# word, encryption, frequency deviation, or other settings!
+    # Note that the radio is configured in LoRa mode so you can't control sync
+    # word, encryption, frequency deviation, or other settings!
 
-	# You can however adjust the transmit power (in dB).  The default is 13 dB but
-	# high power radios like the RFM95 can go up to 23 dB:
-	rfm9x.tx_power = 23
+    # You can however adjust the transmit power (in dB). The default is 13 dB but
+    # high power radios like the RFM95 can go up to 23 dB:
+    rfm9x.tx_power = 23
 
-	# Wait to receive packets.  Note that this library can't receive data at a fast
-	# rate, in fact it can only receive and process one 252 byte packet at a time.
-	# This means you should only use this for low bandwidth scenarios, like sending
-	# and receiving a single message at a time.
-	print("Waiting for packets...")
-	
-	while True:
-				
-		#packet = rfm9x.receive()
-		# Optionally change the receive timeout from its default of 0.5 seconds:
-		packet = rfm9x.receive(timeout=5.0,with_header=True)
-		# If no packet was received during the timeout then None is returned.
-		if packet is None:
-			# Packet has not been received
-			print("Received nothing! Listening again...")
-		else:
-			# Received a packet!
-			# Print out the raw bytes of the packet:
-			print("Received (raw bytes): {0}".format(packet))
-      try:
-        # And decode to ASCII text and print it too.  Note that you always
-        # receive raw bytes and need to convert to a text format like ASCII
-        # if you intend to do string processing on your data.  Make sure the
-        # sending side is sending ASCII data before you try to decode!
-        packet_text = str(packet, "ascii")
-        print("Received (ASCII): {0}".format(packet_text))
-        formatted_txt = extract_values(packet_text)
-        
-        # Also read the RSSI (signal strength) of the last received message and
-        # print it.
-        rssi = rfm9x.last_rssi
-        print("Received signal strength: {0} dB".format(rssi))
-        sender(q, formatted_txt[0], formatted_txt[1], formatted_txt[2])
-      except UnicodeDecodeError:
-        print("Failed to decode packet. Ignoring this packet and continuing...")
+    # Wait to receive packets. Note that this library can't receive data at a fast
+    # rate, in fact it can only receive and process one 252 byte packet at a time.
+    # This means you should only use this for low bandwidth scenarios, like sending
+    # and receiving a single message at a time.
+    print("Waiting for packets...")
+    
+    while True:
+        # Optionally change the receive timeout from its default of 0.5 seconds:
+        packet = rfm9x.receive(timeout=5.0, with_header=True)
+        # If no packet was received during the timeout then None is returned.
+        if packet is None:
+            # Packet has not been received
+            print("Received nothing! Listening again...")
+        else:
+            # Received a packet!
+            # Print out the raw bytes of the packet:
+            print("Received (raw bytes): {0}".format(packet))
+            try:
+                # And decode to ASCII text and print it too. Note that you always
+                # receive raw bytes and need to convert to a text format like ASCII
+                # if you intend to do string processing on your data. Make sure the
+                # sending side is sending ASCII data before you try to decode!
+                packet_text = packet.decode("ascii")
+                print("Received (ASCII): {0}".format(packet_text))
+                formatted_txt = extract_values(packet_text)
+                
+                # Also read the RSSI (signal strength) of the last received message and
+                # print it.
+                rssi = rfm9x.last_rssi
+                print("Received signal strength: {0} dB".format(rssi))
+                sender(queue, formatted_txt[0], formatted_txt[1], formatted_txt[2])
+            except:
+                print("Failed to decode packet. Ignoring this packet and continuing...")
 
 	
-def update_data(queue):
+def update_data_queue(queue):
 	if (not queue.empty()):
 		data = queue.get()
 		now = datetime.datetime.utcnow()
@@ -111,11 +117,11 @@ def update_data(queue):
 		depth = data[2]
 		temperature = data[1]
 		sens_id = data[0]
-		for module in modules:
+		for module in next_modules:
 			if (module['id'] == sens_id):
-				print("FOUND!")
 				module['depth'] = depth/1000
 				module['temperature'] = temperature
+				print(f"FOUND! {temperature}C {depth/10}cm")
 				# Add to historical data
 				history_data[module['id']].append({
 					"timestamp": now.isoformat() + "Z",
@@ -123,13 +129,27 @@ def update_data(queue):
 					"temperature": module['temperature']
 				})
 
+@app.route('/api/refresh_data', methods=['GET'])
+def refresh_data():
+    # Implementa la logica per aggiornare i dati necessari
+    print("Refresh data")
+    update_data_queue(q)
+    return '', 204
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/api/modules', methods=['GET'])
 def get_modules():
-    update_data(q)  # Update the random data each time the endpoint is called
+    print("\n")
+    print("Latching the next modules")
+    print(next_modules)
+    print("\n")
+    for module in modules:
+        module['depth'] = next_modules[module['id']-1]['depth']
+        module['temperature'] = next_modules[module['id']-1]['temperature']  
+
     #update_random_data()
     return jsonify(modules)
 

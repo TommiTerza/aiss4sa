@@ -7,7 +7,8 @@ let sensorIdsUsed = new Set();
 let modules = [];
 let cameraModules = []; // Array to store sensor data for the current camera
 const updateInterval = 5000; // 5 seconds
-const refreshInterval = 500; // 0.5 seconds for table refresh
+const refreshInterval = 50; // 0.05 seconds for sensor refresh
+const refreshSidebarInterval = 500; // 0.5 seconds for table refresh
 let currentCameraId = null; // Store the current camera ID
 let promptShown = false; // Flag to indicate if the prompt has been shown
 let popupUpdateInterval = null; // Interval for updating popup content
@@ -16,7 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initMap();
     fetchModules();
     setInterval(fetchModules, updateInterval);
-    setInterval(refreshSidebar, refreshInterval); // Refresh table every 0.5 seconds
+    setInterval(refreshData, refreshInterval); // Refresh data every refreshInterval
+    setInterval(refreshSidebar, refreshSidebarInterval); // Refresh table every 0.5 seconds
 });
 
 function initMap() {
@@ -361,6 +363,16 @@ function refreshSidebar() {
 
 function viewAverageHistory() {
     window.location.href = `/history/${currentCameraId}`;
+}
+
+function refreshData() {
+  fetch('/api/refresh_data')
+      .then(response => response.json())
+      .then(data => {
+          // Process the refreshed data if needed
+          console.log('Data refreshed:', data);
+      })
+      .catch(error => console.error('Error refreshing data:', error));
 }
 
 function updateColorsAndMarkers() {
