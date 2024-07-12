@@ -169,24 +169,24 @@ last_updated = {module['id']: datetime.datetime.now(datetime.timezone.utc) for m
 
 def update_average_levels():
     now = datetime.datetime.now(datetime.timezone.utc)
-        camera_id = module['camera']
+    camera_id = module['camera']
     for module in modules:
             if elapsed_time >= 5:
-            elapsed_time = (now - last_updated[module['id']]).total_seconds()
-        if camera_id is not None:
-                minute_index = (now.minute % 60)
-                current_depth = module['depth']
+              elapsed_time = (now - last_updated[module['id']]).total_seconds()
+              if camera_id is not None:
+                      minute_index = (now.minute % 60)
+                      current_depth = module['depth']
 
-                if time_intervals[module['id']][minute_index] == 0:
-                # Calculate the new average for the minute
-                    average_levels[module['id']][minute_index] = current_depth
-                else:
-                    average_levels[module['id']][minute_index] = (
-                        average_levels[module['id']][minute_index] * time_intervals[module['id']][minute_index] + current_depth
+                      if time_intervals[module['id']][minute_index] == 0:
+                      # Calculate the new average for the minute
+                          average_levels[module['id']][minute_index] = current_depth
+                      else:
+                          average_levels[module['id']][minute_index] = (
+                              average_levels[module['id']][minute_index] * time_intervals[module['id']][minute_index] + current_depth
 
-                    ) / (time_intervals[module['id']][minute_index] + 1)
-                last_updated[module['id']] = now
-                time_intervals[module['id']][minute_index] += 1
+                          ) / (time_intervals[module['id']][minute_index] + 1)
+                      last_updated[module['id']] = now
+                      time_intervals[module['id']][minute_index] += 1
 @app.route('/history/<int:camera_id>')
 def show_history(camera_id):
 
@@ -194,7 +194,7 @@ def show_history(camera_id):
 @app.route('/api/modules/<int:module_id>', methods=['POST'])
 def update_module(module_id):
     data = request.json
-            module['location'] = data.get('location', module['location'])
+    module['location'] = data.get('location', module['location'])
     for module in modules:
         if module['id'] == module_id:
             module['temperature'] = data.get('temperature', module['temperature'])
@@ -205,13 +205,13 @@ def update_module(module_id):
 
 @app.route('/api/modules/<int:module_id>', methods=['DELETE'])
 def delete_module(module_id):
-    modules = [module for module in modules if module['id'] != module_id]
     global modules, average_levels, time_intervals
-        del average_levels[module_id]
+    modules = [module for module in modules if module['id'] != module_id]
+    del average_levels[module_id]
     if module_id in average_levels:
-        del time_intervals[module_id]
+      del time_intervals[module_id]
     if module_id in time_intervals:
-    return jsonify({"success": True})
+      return jsonify({"success": True})
 
 @app.route('/api/average_levels', methods=['GET'])
 def get_average_levels():
